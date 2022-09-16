@@ -252,6 +252,9 @@ static void scan_and_kill(void)
 
 	/* Kill the victims */
 	for (i = 0; i < nr_to_kill; i++) {
+		static const struct sched_param sched_max_prio = {
+			.sched_priority = MAX_RT_PRIO - 1
+		};
 		struct victim_info *victim = &victims[i];
 		struct task_struct *t, *vtsk = victim->tsk;
 		struct mm_struct *mm = victim->mm;
@@ -282,6 +285,9 @@ static void scan_and_kill(void)
 		for_each_thread(vtsk, t)
 			set_task_rt_prio(t, 1);
 		rcu_read_unlock();
+
+		/* Elevate the victim to SCHED_RR with the highest RT priority */
+		sched_setscheduler_nocheck(vtsk, SCHED_RR, &sched_max_prio);
 
 		/* Allow the victim to run on any CPU. This won't schedule. */
 		set_cpus_allowed_ptr(vtsk, cpu_all_mask);
@@ -461,6 +467,12 @@ void simple_lmk_mm_freed(struct mm_struct *mm)
 	read_unlock(&mm_free_lock);
 }
 
+void simple_lmk_trigger(void)
+{
+	if (!atomic_cmpxchg_acquire(&needs_reclaim, 0, 1))
+		wake_up(&oom_waitq);
+}
+
 static int simple_lmk_vmpressure_cb(struct notifier_block *nb,
 				    unsigned long pressure, void *data)
 {
@@ -470,6 +482,8 @@ static int simple_lmk_vmpressure_cb(struct notifier_block *nb,
 		if (waitqueue_active(&oom_waitq))
 			wake_up(&oom_waitq);
 	}
+	if (pressure >= 90)
+		simple_lmk_trigger();
 
 	return NOTIFY_OK;
 }
