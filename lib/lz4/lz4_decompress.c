@@ -119,8 +119,11 @@ static FORCE_INLINE int LZ4_decompress_generic(
 
 	/* Main Loop : decode sequences */
 	while (1) {
-		token = *ip++;
-		length = token >> ML_BITS;
+		size_t length;
+		const BYTE *match;
+		size_t offset;
+		// token = *ip++;
+		// length = token >> ML_BITS;
 
 		/* get literal length */
 		unsigned int const token = *ip++;
@@ -189,7 +192,7 @@ static FORCE_INLINE int LZ4_decompress_generic(
 
 		/* decode literal length */
 		if (length == RUN_MASK) {
-
+			unsigned int s;
 			if (unlikely(endOnInput ? ip >= iend - RUN_MASK : 0)) {
 				/* overflow detection */
 				goto _output_error;
@@ -274,7 +277,7 @@ static FORCE_INLINE int LZ4_decompress_generic(
 				break;
 		} else {
 			/* may overwrite up to WILDCOPYLENGTH beyond cpy */
-			LZ4_wildCopy(op, ip, cpy);
+			LZ4_wildCopy8(op, ip, cpy);
 			ip += length;
 			op = cpy;
 		}
