@@ -11,6 +11,32 @@ GCC_32_DIR="$HOME/tc/arm-linux-androideabi-4.9"
 AK3_DIR="$HOME/AnyKernel3"
 DEFCONFIG="vendor/ginkgo-perf_defconfig"
 
+
+if ! [ -d "${TC_DIR}" ]; then
+    echo "Clang not found! Cloning to ${TC_DIR}..."
+    if ! git clone --depth=1 https://gitlab.com/moehacker/clang-r498229b ${TC_DIR}; then
+        echo "Cloning failed! Aborting..."
+        exit 1
+    fi
+fi
+
+if ! [ -d "${GCC_64_DIR}" ]; then
+    echo "gcc not found! Cloning to ${GCC_64_DIR}..."
+    if ! git clone --depth=1 -b 14 https://github.com/ZyCromerZ/aarch64-zyc-linux-gnu ${GCC_64_DIR}; then
+        echo "Cloning failed! Aborting..."
+        exit 1
+    fi
+fi
+
+if ! [ -d "${GCC_32_DIR}" ]; then
+    echo "gcc_32 not found! Cloning to ${GCC_32_DIR}..."
+    if ! git clone --depth=1 -b 14 https://github.com/ZyCromerZ/arm-zyc-linux-gnueabi ${GCC_32_DIR}; then
+        echo "Cloning failed! Aborting..."
+        exit 1
+    fi
+fi
+
+
 MAKE_PARAMS="O=out ARCH=arm64 CC=clang LD=ld.lld AR=llvm-ar AS=llvm-as NM=llvm-nm \
 	OBJCOPY=llvm-objcopy OBJDUMP=llvm-objdump STRIP=llvm-strip \
 	CLANG_TRIPLE=aarch64-linux-gnu- \
