@@ -41,7 +41,7 @@
 #define FORCE_INLINE __always_inline
 
 /* LZ4_FORCE_O2_GCC_PPC64LE and LZ4_FORCE_O2_INLINE_GCC_PPC64LE
- * gcc on ppc64le generates an unrolled SIMDized loop for LZ4_wildCopy8,
+ * gcc on ppc64le generates an unrolled SIMDized loop for LZ4_wildCopy,
  * together with a simple 8-byte copy loop as a fall-back path.
  * However, this optimization hurts the decompression speed by >30%,
  * because the execution does not go to the optimized loop
@@ -49,10 +49,10 @@
  * before going to the fall-back path become useless overhead.
  * This optimization happens only with the -O3 flag, and -O2 generates
  * a simple 8-byte copy loop.
- * With gcc on ppc64le, all of the LZ4_decompress_* and LZ4_wildCopy8
+ * With gcc on ppc64le, all of the LZ4_decompress_* and LZ4_wildCopy
  * functions are annotated with __attribute__((optimize("O2"))),
- * and also LZ4_wildCopy8 is forcibly inlined, so that the O2 attribute
- * of LZ4_wildCopy8 does not affect the compression speed.
+ * and also LZ4_wildCopy is forcibly inlined, so that the O2 attribute
+ * of LZ4_wildCopy does not affect the compression speed.
  */
 #if defined(__PPC64__) && defined(__LITTLE_ENDIAN__) && defined(__GNUC__) && !defined(__clang__)
 #  define FORCE_O2_GCC_PPC64LE __attribute__((optimize("O2")))
@@ -192,7 +192,7 @@ static FORCE_INLINE void LZ4_copy8(void *dst, const void *src)
  * customized variant of memcpy,
  * which can overwrite up to 7 bytes beyond dstEnd
  */
-static FORCE_O2_INLINE_GCC_PPC64LE void LZ4_wildCopy8(void *dstPtr,
+static FORCE_O2_INLINE_GCC_PPC64LE void LZ4_wildCopy(void *dstPtr,
 	const void *srcPtr, void *dstEnd)
 {
 	BYTE *d = (BYTE *)dstPtr;

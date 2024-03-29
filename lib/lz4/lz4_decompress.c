@@ -547,7 +547,7 @@ static FORCE_INLINE int LZ4_decompress_generic(
 				break;
 		} else {
 			/* may overwrite up to WILDCOPYLENGTH beyond cpy */
-			LZ4_wildCopy8(op, ip, cpy);
+			LZ4_wildCopy(op, ip, cpy);
 			ip += length;
 			op = cpy;
 		}
@@ -685,7 +685,7 @@ safe_match_copy:
 			}
 
 			if (op < oCopyLimit) {
-				LZ4_wildCopy8(op, match, oCopyLimit);
+				LZ4_wildCopy(op, match, oCopyLimit);
 				match += oCopyLimit - op;
 				op = oCopyLimit;
 			}
@@ -694,7 +694,7 @@ safe_match_copy:
 		} else {
 			LZ4_copy8(op, match);
 			if (length > 16)
-				LZ4_wildCopy8(op + 8, match + 8, cpy);
+				LZ4_wildCopy(op + 8, match + 8, cpy);
 		}
 		op = cpy; /* wildcopy correction */
 	}
