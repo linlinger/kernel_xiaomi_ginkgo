@@ -2,9 +2,10 @@
 #
 # Compile script for QuicksilveR kernel
 # Copyright (C) 2020-2023 Adithya R.
+# Copyright (C) 2024 linlinger.
 
 SECONDS=0 # builtin bash timer
-ZIPNAME="QuicksilveRV2-ginkgo-$(date '+%Y%m%d-%H%M').zip"
+ZIPNAME="QuicksilveRV2-ginkgo-erofs-$(date '+%Y%m%d-%H%M').zip"
 TC_DIR="$HOME/tc/clang-19.0.0"
 GCC_64_DIR="$HOME/tc/aarch64-linux-android-4.9"
 GCC_32_DIR="$HOME/tc/arm-linux-androideabi-4.9"
@@ -80,7 +81,7 @@ echo -e "\nKernel compiled succesfully! Zipping up...\n"
 if [ -d "$AK3_DIR" ]; then
 	cp -r $AK3_DIR AnyKernel3
 	git -C AnyKernel3 checkout master &> /dev/null
-elif ! git clone -q https://github.com/ghostrider-reborn/AnyKernel3 -b master; then
+elif ! git clone -q https://github.com/linlinger/AnyKernel3 -b ginkgo-QuicksilveR; then
 	echo -e "\nAnyKernel3 repo not found locally and couldn't clone from GitHub! Aborting..."
 	exit 1
 fi
