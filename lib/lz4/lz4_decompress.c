@@ -80,7 +80,7 @@ LZ4_memcpy_using_offset_base(BYTE * dstPtr, const BYTE * srcPtr, BYTE * dstEnd,
 		srcPtr += 8;
 	}
 
-	LZ4_wildCopy8(dstPtr, srcPtr, dstEnd);
+	LZ4_wildCopy(dstPtr, srcPtr, dstEnd);
 }
 
 /* customized variant of memcpy, which can overwrite up to 32 bytes beyond dstEnd
@@ -258,7 +258,7 @@ static FORCE_INLINE int LZ4_decompress_generic(
 				if (cpy > oend - 8) {
 					goto safe_literal_copy;
 				}
-				LZ4_wildCopy8(op, ip, cpy);
+				LZ4_wildCopy(op, ip, cpy);
 				/* LZ4_decompress_fast() cannot copy more than 8 bytes at a time */
 				/* it doesn't know input length, and only relies on end-of-block */
 				/* properties */
@@ -667,7 +667,7 @@ safe_match_copy:
 			LZ4_memcpy(op + 4, match, 4);
 			match -= dec64table[offset];
 		} else {
-			LZ4_copy8(op, match);
+			LZ4_copy(op, match);
 			match += 8;
 		}
 
@@ -692,7 +692,7 @@ safe_match_copy:
 			while (op < cpy)
 				*op++ = *match++;
 		} else {
-			LZ4_copy8(op, match);
+			LZ4_copy(op, match);
 			if (length > 16)
 				LZ4_wildCopy(op + 8, match + 8, cpy);
 		}
