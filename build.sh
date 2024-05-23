@@ -2,14 +2,41 @@
 #
 # Compile script for QuicksilveR kernel
 # Copyright (C) 2020-2023 Adithya R.
+# Copyright (C) 2024 linlinger.
 
 SECONDS=0 # builtin bash timer
-ZIPNAME="QuicksilveRV2-ginkgo-$(date '+%Y%m%d-%H%M').zip"
-TC_DIR="$HOME/tc/clang-r450784d"
+ZIPNAME="QuicksilveRV2-ginkgo-erofs-$(date '+%Y%m%d-%H%M').zip"
+TC_DIR="$HOME/tc/clang-19.0.0"
 GCC_64_DIR="$HOME/tc/aarch64-linux-android-4.9"
 GCC_32_DIR="$HOME/tc/arm-linux-androideabi-4.9"
 AK3_DIR="$HOME/AnyKernel3"
 DEFCONFIG="vendor/ginkgo-perf_defconfig"
+
+
+if ! [ -d "${TC_DIR}" ]; then
+    echo "Clang not found! Cloning to ${TC_DIR}..."
+    if ! git clone --depth=1 https://gitlab.com/moehacker/clang-r498229b ${TC_DIR}; then
+        echo "Cloning failed! Aborting..."
+        exit 1
+    fi
+fi
+
+if ! [ -d "${GCC_64_DIR}" ]; then
+    echo "gcc not found! Cloning to ${GCC_64_DIR}..."
+    if ! git clone --depth=1 -b 14 https://github.com/ZyCromerZ/aarch64-zyc-linux-gnu ${GCC_64_DIR}; then
+        echo "Cloning failed! Aborting..."
+        exit 1
+    fi
+fi
+
+if ! [ -d "${GCC_32_DIR}" ]; then
+    echo "gcc_32 not found! Cloning to ${GCC_32_DIR}..."
+    if ! git clone --depth=1 -b 14 https://github.com/ZyCromerZ/arm-zyc-linux-gnueabi ${GCC_32_DIR}; then
+        echo "Cloning failed! Aborting..."
+        exit 1
+    fi
+fi
+
 
 MAKE_PARAMS="O=out ARCH=arm64 CC=clang LD=ld.lld AR=llvm-ar AS=llvm-as NM=llvm-nm \
 	OBJCOPY=llvm-objcopy OBJDUMP=llvm-objdump STRIP=llvm-strip \
@@ -54,7 +81,7 @@ echo -e "\nKernel compiled succesfully! Zipping up...\n"
 if [ -d "$AK3_DIR" ]; then
 	cp -r $AK3_DIR AnyKernel3
 	git -C AnyKernel3 checkout master &> /dev/null
-elif ! git clone -q https://github.com/ghostrider-reborn/AnyKernel3 -b master; then
+elif ! git clone -q https://github.com/linlinger/AnyKernel3 -b ginkgo-QuicksilveR; then
 	echo -e "\nAnyKernel3 repo not found locally and couldn't clone from GitHub! Aborting..."
 	exit 1
 fi
